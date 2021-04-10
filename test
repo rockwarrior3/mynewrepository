@@ -1,0 +1,605 @@
+NET3012-Commands-Guide
+Configuration
+Card/MDA:
+show card
+
+show mda
+
+configure card 1 card-type iom3-xp
+
+configure card 1 mda 1 mda-type m10-1gb-xp-sfp
+
+configure card 1 mda 1 no shutdown
+
+Port:
+configure port 1/1/X no shutdown
+
+Interface
+configure router interface {name} address {address}
+
+configure router interface {name} loopback
+
+configure router interface {name} port {port}
+
+configure router interface {name} loopback
+
+Static Routes:
+configure router static-route {remote network /mask} next-hop {next-hop-address}
+
+OSPF:
+configure router router-id <32-bit-ID>
+
+configure router ospf area <area #> interface interface-type
+
+configure router ospf area 0 nssa
+
+configure router ospf area 0 stub
+
+configure router ospf area 2 stub no summaries (totally stubby area)
+
+configure router ospf export {Policy Name}
+
+configure router ospf traffic-engineering
+
+configure router ospf rsvp-shortcut
+
+-over-RSVP
+
+configure router ospf ldp-over-rsvp
+
+configure router ospf asbr
+
+LDP:
+configure router ldp no shutdown
+
+configure router ldp interface-parameters interface
+
+configure router ldp-shortcut
+
+configure router ldp shortcut-local-ttl-propagate (turns on uniform mode for local traffic)
+
+configure router ldp no shortcut-local-ttl-propagate (turns on pipe mode for local traffic)
+
+configure router ldp shortcut-transit-ttl-propagate (turns on uniform mode for transit traffic)
+
+configure router ldp no shortcut-transit-ttl-propagate (turns on pipe mode for transit traffic)
+
+T-LDP
+configure router ldp targeted-session peer 10.10.10.9 {tunneling}
+
+ECMP:
+configure router ecmp {max-ecmp-routes}
+
+BGP:
+configure router autonomous-system {AS Number}
+
+configure router bgp group neighbor {IP-address} peer-as {AS-#}
+
+configure router bgp group next-hop-self
+
+configure router bgp export
+
+BGP Next-hop resolution with tunnels
+configure router bgp next-hop-resolution shortcut-tunnel family ipv4 resolution any
+
+Policy Statement:
+configure router policy-options begin
+
+configure router policy-options policy-statement entry from protocol {direct | ospf | bgp | isis | rip}
+
+configure router policy-options policy-statement entry to protocol {direct | ospf | bgp | isis | rip}
+
+configure router policy-options policy-statement entry action {accept | next-entry | next-policy | reject}
+
+exit
+
+configure router policy-options commit
+
+RSVP:
+configure router mpls no shutdown
+
+configure router rsvp no shutdown
+
+configure router mpls interface {interface name} no shutdown
+
+Path Creation
+configure router mpls path pathToRx shutdown
+
+configure router mpls path pathToRx hop 10 10.10.10.6 {strict | loose}
+
+configure router mpls path pathToRx no shutdown
+
+Creation of LSP
+configure router mpls lsp lspToRx shut
+
+configure router mpls lsp lspToRx to 10.10.10.x
+
+configure router mpls lsp lspToRx cspf
+
+configure router mpls lsp lspToRx primary [include green] no shutdown
+
+configure router mpls lsp lspToRx secondary [exclude red] no shutdown
+
+configure router mpls lsp lspToRx secondary [standby] no shutdown
+
+configure router mpls lsp lspToRx no shutdown
+
+PIPE mode vs Uniform mode
+configure router rsvp shortcut-local-ttl-propagate (turns on uniform mode for local traffic)
+
+configure router rsvp no shortcut-local-ttl-propagate (turns on pipe mode for local traffic)
+
+configure router rsvp shortcut-transit-ttl-propagate (turns on uniform mode for transit traffic)
+
+configure router rsvp no shortcut-transit-ttl-propagate (turns on pipe mode for transit traffic)
+
+Link Coloring:
+configure router if-attribute admin-group green value 1
+
+configure router mpls interface toR3 admin-group red
+
+IPv6 (6pe):
+configure router interface "ToR9" ipv6 (link local)
+
+configure router interface "system" ipv6 address fd00:7:7::5/128
+
+OSPFv3 config
+configure router ospf3 area 0 interface "system" interface-type point-to-point
+
+configure router ospf3 area 0 interface "system" no shutdown
+
+configure router ospf3 asbr
+
+configure router ospf3 no shutdown
+
+LDP IPv6
+configure router ldp interface-parameters interface "toR4" dual-stack ipv4 no shutdown
+
+MP-BGP config
+configure router autonomous-system {AS Number}
+
+configure router bgp group "R5ToR7" family ipv6
+
+configure router bgp group "R5ToR7" peer-as 65507
+
+configure router bgp group "R5ToR7" neighbor 10.10.10.7 advertise-label ipv6
+
+configure router bgp no shutdown
+
+Epipe
+CE:
+configure port 1/1/2 shut
+
+configure port 1/1/2 ethernet encap-type dot1q
+
+configure port 1/1/2 no shut
+
+configure router interface toR5_10 address 192.168.10.9/24
+
+configure router interface toR5_10 port 1/1/2:10
+
+PE:
+configure port 1/1/2 shut
+
+configure port 1/1/2 ethernet mode access
+
+configure port 1/1/2 ethernet encap-type dot1q
+
+configure port 1/1/2 no shut
+
+configure service sdp {sdp-id} mpls create
+
+    far-end 10.10.10.x
+
+    ldp
+
+    lsp {lsp-name}
+
+    no shut
+
+    exit
+
+configure service customer 1 create
+
+    exit
+
+configure service epipe {service-id} customer 1 create
+
+    sap 1/1/2:{q-tag} create
+
+       no shut
+
+       exit
+
+    spoke-sdp {sdp-id}:{vc-id} create
+
+       no shut
+
+       exit
+
+    no shut
+
+VPLS:
+CE:
+configure port 1/1/2 shut
+
+configure port 1/1/2 ethernet encap-type dot1q
+
+configure port 1/1/2 no shut
+
+configure router interface toR5_10 address 192.168.10.9/24
+
+configure router interface toR5_10 port 1/1/2:10
+
+PE:
+configure port 1/1/2 shut
+
+configure port 1/1/2 ethernet mode access
+
+configure port 1/1/2 ethernet encap-type dot1q
+
+configure port 1/1/2 no shut
+
+configure service sdp {sdp-id} mpls create
+
+    far-end 10.10.10.x
+
+    ldp
+
+    lsp {lsp-name}
+
+    no shut
+
+    exit
+
+configure service customer 1 create
+
+    exit
+
+configure service vpls {service-id} customer 1 create
+
+    sap 1/1/2:{q-tag} create
+
+       no shut
+
+       exit
+
+    mesh-sdp {sdp-id} create
+
+    no shut
+
+    exit
+
+    spoke-sdp {sdp-id}:{vc-id} create
+
+       no shut
+
+       exit
+
+    no shut
+
+    exit
+
+IES
+IES Core router
+configure service ies x000 customer 1 create
+
+   interface toRx_ies create
+
+      address 172.17.X.1/24
+
+      ip-mtu 1500
+
+   spoke-sdp X:x000 create
+
+      no shut
+
+      exit
+
+   no shut
+
+   exit
+
+CE
+configure router ospf area 0 interface "toRX" mtu 1500
+
+VPRN
+PE:
+configure router autonomous-system 64496
+
+configure router bgp
+
+    group MPBGP
+
+       family vpn-ipv4
+
+       neighbor 10.10.10.y peer-as 64496
+
+       local-address 10.10.10.x
+
+       no shutdown
+
+       exit
+
+    no shutdown
+
+configure service customer {110/120} create
+
+    description {Blue/Red}
+
+    exit
+
+vprn {serv#} customer {cus#} create
+
+    description VPRN for {Blue/Red}
+
+    router-id 10.10.10.x
+
+    auto-bind-tunnel resolution-filter ldp
+
+    auto-bind-tunnel resolution filter
+
+    auto-bind-tunnel any
+
+    route-distinguisher 64496:{110/120}
+
+    vrf-target target:64496:{110/120}
+
+    interface toRX_VPRN create
+
+       address 10.x.x.x/24
+
+       sap 1/1/2:{110/120} create
+
+          no shutdown
+
+          exit
+
+       no shutdown
+
+     &nbsp exit
+
+    no shutdown
+
+configure router policy-options
+
+    begin
+
+    policy-statement mpbpg-bgp
+
+       entry 10
+
+          from protocol bgp-vpn
+
+          action accept
+
+          exit
+
+       exit
+
+   exit
+
+   commit
+
+configure service vprn {serv#}
+
+    shutdown
+
+    autonomous-system 64496
+
+    bgp
+
+       group toRX_CE_BGP
+
+          neighbor 10.x.x.x peer-as XXXXX
+
+          export mpbpg-bgp
+
+          no shutdown
+
+          exit
+
+       no shutdown
+
+       exit
+
+    no shutdown
+
+CE:
+configure router interface to_Rx-{110/120}
+
+    port 1/1/2:{110/120}
+
+    address 10.x.x.x/24
+
+    no shutdown
+
+    exit
+
+configure router policy-options
+
+    begin
+
+    policy-statement direct-bgp
+
+       entry 10
+
+          from protocol direct
+
+          to protocol bgp
+
+          action accept
+
+          exit
+
+       exit
+
+    exit
+
+commit
+
+configure router
+
+    autonomous-system XXXXX
+
+    bgp
+
+       group toRX_PE
+
+          neighbor 10.x.x.x peer-as 64496
+
+          export direct-bgp
+
+          no shutdown
+
+          exit
+
+      no shutdown
+
+      exit
+
+    no shutdown
+
+Resilience
+configure router mpls lsp secondary # Def'n of secondary
+
+configure router mpls lsp secondary standby # (hot) standby
+
+configure router mpls lsp fast-reroute facility # Bypass tunnel
+
+SRLG
+configure router if-attribute srlg-group value {number} # Definition of the group
+
+configure router mpls interface srlg-group # Define link membership
+
+configure router mpls lsp cspf # Enable CSPF; NEEDED!
+
+configure router mpls lsp secondary srlg # Enable use of SRLG
+
+Troubleshooting
+Search for a Command
+tree flat | match "keyword"
+
+General Commands
+show router status
+
+show router route-table
+
+show router tunnel-table
+
+telnet
+
+ping
+
+traceroute
+
+oam lsp-ping prefix
+
+oam lsp-trace prefix
+
+oam ldp-treetrace prefix
+
+show router ecmp
+
+Port Commands
+show port
+
+show port 1/1/x [detail]
+
+Interface Commands
+show router interface
+
+show router interface "int-name" detail
+
+show router interface summary
+
+OSPF Commands
+show router ospf status
+
+show router ospf routes
+
+show router ospf opaque-database
+
+show router ospf neighbor
+
+show router ospf interface
+
+show router ospf database
+
+show router ospf area {area-num} [detail]
+
+LDP Commands
+show router ldp status
+
+show router ldp bindings [active]
+
+show router ldp parameters
+
+show router ldp discovery [detail]
+
+show router ldp interface
+
+show router ldp session
+
+clear router ldp session
+
+MPLS/RSVP Commands
+tools perform router mpls resignal lsp path
+
+show router mpls status
+
+show router mpls path
+
+show router mpls lsp [detail]
+
+show router mpls lsp path detail
+
+show router mpls interface
+
+show router rsvp status
+
+show router rsvp session
+
+show router rsvp interface [detail]
+
+show router rsvp neighbor
+
+Config Checklist
+General
+Configure and no shut ports
+Ensure interfaces have right ips and ports
+Configure a router ID
+RSVP
+ensure IGP is working
+OSPF Traffic engineering
+BGP
+Ensure a autonomous system is configured
+LDP over RSVP
+T-ldp from abr to abr
+LSP from abr to abr
+enable ldp over rsvp
+6PE
+Configure ospv3
+Ensure to put in asbr command
+COnfigure epxort policies in both directions
+EPIPE
+Configure CE with dot1q and no shut
+On ce configure interface with 1/1/1:XXX
+On PE configure ethernet mode access and dot1q
+Configure Customer
+Configure sdp and enabled ldp in sdp if using ldp
+Configure sap and spoke-sdp
+VPLS
+Configure CE with dot1q and no shut
+On ce configure interface with 1/1/1:XXX
+On PE configure ethernet mode access and dot1q
+Configure Customer
+Configure sdp and enabled ldp in sdp if using ldp
+Configure sap and spoke/mesh sdp
+IES
+Change MTU in IES
+CHnage ospf MTU
+VPRN
+Use family vpn-ipv4 MPBGP
+configure router-id in service
+Set RD and RT
